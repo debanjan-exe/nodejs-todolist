@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ToDo List</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+  </head>
+  <body>
+    <div class="box" id="heading">
+      <h1><%= listTitle %></h1>
+    </div>
+    <div class="box">
+      <% newListItems.forEach((item)=>{ %>
+
+      <form action="/delete" method="POST">
+        <div class="item">
+          <input
+            type="checkbox"
+            name="checkbox"
+            value="<%= item._id %>"
+            onChange="this.form.submit()"
+          />
+          <p><%= item.name %></p>
+        </div>
+        <input type="hidden" name="listName" value="<%= listTitle %>"></input>
+      </form>
+
+      <% }) %>
+
+      <!-- <% for(let i = 0; i < newListItems.length; i++){ %>
+      <div class="item">
+        <input type="checkbox" />
+        <p><%= newListItems[i].name %></p>
+      </div>
+      <% } %> -->
+
+      <form class="item" action="/" method="POST">
+        <input
+          type="text"
+          name="newItem"
+          placeholder="New Item"
+          autocomplete="off"
+        />
+        <button type="submit" name="list" value="<%= listTitle %>">+</button>
+      </form>
+    </div>
+    <footer>
+      © Copyright 2021
+      <a
+        href="https://github.com/debanjan-exe"
+        target="_blank"
+        style="text-decoration: none"
+      >
+        Debanjan
+      </a>
+    </footer>
+  </body>
+</html>
