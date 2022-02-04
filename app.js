@@ -13,6 +13,8 @@ app.use(express.static("public"))
 app.set('view engine', 'ejs');
 
 mongoose.connect(`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASS}@cluster0.iswki.mongodb.net/todolistDB`, { useNewUrlParser: true });
+// mongoose.connect("mongodb://localhost:27017/todolistDB")
+
 
 const itemsSchema = {
     name: String,
@@ -67,12 +69,15 @@ app.get("/", (req, res) => {
 
 })
 
+
+
 app.get("/:customListName", (req, res) => {
     const customListName = _.capitalize(req.params.customListName);
 
     List.findOne({ name: customListName }, (err, foundList) => {
         if (!err) {
             if (!foundList) {
+
                 const list = new List({
                     name: customListName,
                     items: defaultItems
@@ -80,14 +85,21 @@ app.get("/:customListName", (req, res) => {
                 list.save();
 
                 res.redirect("/" + customListName)
-
             } else {
+                if (foundList.items.length === 0) {
+                    List.findOneAndUpdate({ name: customListName }, { items: defaultItems }, { new: true }, (err, result) => {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            console.log("succesfully inserted");
+                        }
+                    });
+                    return res.redirect("/" + customListName)
+                }
                 res.render("list", { listTitle: foundList.name, newListItems: foundList.items })
             }
         }
     })
-
-
 })
 
 function sleep(time) {
@@ -117,12 +129,6 @@ app.post("/", (req, res) => {
         })
     }
 
-    // if (itemName === "") {
-    //     alert("Enter a valid to-do");
-    // } else {
-
-    // }
-
 })
 
 app.post("/delete", (req, res) => {
@@ -130,6 +136,8 @@ app.post("/delete", (req, res) => {
     const listName = req.body.listName;
 
 
+    // console.log("." + listName + ".");
+    // console.log("." + checkboxId + ".");
     if (listName === "Today") {
         Item.findByIdAndRemove(checkboxId, (err) => {
             if (!err) {
@@ -143,9 +151,6 @@ app.post("/delete", (req, res) => {
             }
         })
     }
-
-
-
 })
 
 app.listen(process.env.PORT || 3000, () => {
